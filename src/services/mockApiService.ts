@@ -1,105 +1,127 @@
 
-// This simulates the actual API endpoint that would handle OpenAI requests
-// In a real deployment, this would be replaced with a proper backend service
+// This simulates the Gemini API endpoint for development
+// In production, this would be replaced with actual Gemini API integration
 
 interface RoadmapRequest {
   prompt: string;
+  model: string;
+  userProfile: any;
 }
 
-export const mockGenerateRoadmap = async (request: RoadmapRequest): Promise<any> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 3000));
+export const mockGenerateRoadmapWithGemini = async (request: RoadmapRequest): Promise<any> => {
+  // Simulate Gemini API delay (faster than OpenAI typically)
+  await new Promise(resolve => setTimeout(resolve, 2500));
   
   // Simulate occasional API failures for realistic error handling
-  if (Math.random() < 0.1) {
-    throw new Error('API temporarily unavailable');
+  if (Math.random() < 0.05) { // Lower failure rate for Gemini
+    throw new Error('Gemini API temporarily unavailable');
   }
 
-  // Parse the prompt to extract user information
-  const prompt = request.prompt;
-  const targetRoleMatch = prompt.match(/transitioning to (.*?) in the/);
-  const industryMatch = prompt.match(/in the (.*?) industry/);
-  const timeframeMatch = prompt.match(/Target Timeframe: (.*?)$/m);
+  const { userProfile } = request;
   
-  const targetRole = targetRoleMatch ? targetRoleMatch[1] : 'Software Developer';
-  const industry = industryMatch ? industryMatch[1] : 'Technology';
-  const timeframe = timeframeMatch ? timeframeMatch[1] : '6 months';
-
-  // Generate AI-like response based on extracted information
+  // Generate AI-like response based on user profile using Gemini-style processing
   const aiGeneratedRoadmap = {
-    role: targetRole,
-    timeline: timeframe,
-    milestones: [
-      {
-        id: 1,
-        title: `${targetRole} Fundamentals`,
-        description: `Master the core concepts and technologies essential for ${targetRole} role`,
-        duration: "4-6 weeks",
-        tasks: [
-          `Study ${targetRole.toLowerCase()} best practices and methodologies`,
-          `Complete relevant online courses and certifications`,
-          `Set up development environment and essential tools`,
-          "Join professional communities and forums"
-        ],
-        completed: false,
-        progress: 0
-      },
-      {
-        id: 2,
-        title: "Hands-on Project Development",
-        description: `Build practical projects that demonstrate ${targetRole} capabilities`,
-        duration: "6-8 weeks",
-        tasks: [
-          "Create portfolio project showcasing key skills",
-          "Contribute to open-source projects",
-          "Document your learning journey and technical decisions",
-          "Seek code reviews and feedback from experienced professionals"
-        ],
-        completed: false,
-        progress: 0
-      },
-      {
-        id: 3,
-        title: `${industry} Domain Knowledge`,
-        description: `Develop expertise in ${industry.toLowerCase()} industry standards and practices`,
-        duration: "3-4 weeks",
-        tasks: [
-          `Research ${industry.toLowerCase()} industry trends and challenges`,
-          "Learn industry-specific tools and technologies",
-          "Study successful companies and their technical approaches",
-          "Network with professionals in the industry"
-        ],
-        completed: false,
-        progress: 0
-      },
-      {
-        id: 4,
-        title: "Professional Preparation",
-        description: "Prepare for job applications and interviews in your target role",
-        duration: "3-4 weeks",
-        tasks: [
-          `Optimize resume for ${targetRole} positions`,
-          "Practice technical and behavioral interviews",
-          "Build professional online presence (LinkedIn, GitHub)",
-          "Apply to target positions and prepare for negotiations"
-        ],
-        completed: false,
-        progress: 0
-      }
-    ]
+    role: userProfile.targetRole,
+    timeline: userProfile.timeframe,
+    milestones: generateGeminiStyleMilestones(userProfile)
   };
 
   return { roadmap: aiGeneratedRoadmap };
 };
 
-// Override fetch for the specific API endpoint
+const generateGeminiStyleMilestones = (userProfile: any) => {
+  const isJunior = userProfile.experience === '0-1' || userProfile.experience === '1-3';
+  const isSenior = userProfile.experience === '6-10' || userProfile.experience === '10+';
+  
+  // Gemini tends to be more detailed and practical in its responses
+  const milestones = [
+    {
+      id: 1,
+      title: `${userProfile.targetRole} Skill Foundation`,
+      description: `Build comprehensive understanding of ${userProfile.targetRole} core competencies tailored to ${userProfile.industry} industry`,
+      duration: userProfile.timeframe === '3-months' ? '3-4 weeks' : '5-6 weeks',
+      tasks: [
+        `Master ${userProfile.targetRole.toLowerCase()} fundamentals through structured learning`,
+        `Complete ${userProfile.industry.toLowerCase()}-specific certification programs`,
+        'Build practical projects demonstrating key concepts',
+        'Join professional communities and establish mentorship connections'
+      ],
+      completed: false,
+      progress: 0
+    },
+    {
+      id: 2,
+      title: 'Hands-on Portfolio Development',
+      description: `Create compelling portfolio showcasing ${userProfile.targetRole} capabilities`,
+      duration: userProfile.timeframe === '3-months' ? '4-5 weeks' : '6-8 weeks',
+      tasks: [
+        `Develop 2-3 comprehensive ${userProfile.targetRole.toLowerCase()} projects`,
+        'Implement industry best practices and modern methodologies',
+        'Document technical decisions and problem-solving approaches',
+        'Gather feedback from industry professionals and iterate'
+      ],
+      completed: false,
+      progress: 0
+    },
+    {
+      id: 3,
+      title: `${userProfile.industry} Industry Expertise`,
+      description: `Deep dive into ${userProfile.industry.toLowerCase()} sector requirements and trends`,
+      duration: userProfile.timeframe === '3-months' ? '2-3 weeks' : '4-5 weeks',
+      tasks: [
+        `Research current ${userProfile.industry.toLowerCase()} market dynamics and challenges`,
+        'Learn industry-standard tools, platforms, and technologies',
+        'Study successful case studies and implementation strategies',
+        'Build network within the industry through events and online communities'
+      ],
+      completed: false,
+      progress: 0
+    },
+    {
+      id: 4,
+      title: 'Professional Market Preparation',
+      description: 'Optimize professional presence and prepare for job market entry',
+      duration: userProfile.timeframe === '3-months' ? '2-3 weeks' : '3-4 weeks',
+      tasks: [
+        `Craft compelling resume highlighting ${userProfile.targetRole} transition`,
+        'Prepare for technical interviews with practice and mock sessions',
+        'Establish strong online presence across professional platforms',
+        'Execute strategic job search and networking campaign'
+      ],
+      completed: false,
+      progress: 0
+    }
+  ];
+
+  // Add advanced milestone for senior professionals
+  if (isSenior) {
+    milestones.push({
+      id: 5,
+      title: 'Leadership & Strategic Impact',
+      description: 'Develop leadership capabilities and strategic thinking for senior roles',
+      duration: userProfile.timeframe === '3-months' ? '2 weeks' : '3-4 weeks',
+      tasks: [
+        'Develop team leadership and management skills',
+        'Learn strategic planning and business impact measurement',
+        'Build thought leadership through content creation and speaking',
+        'Prepare for senior-level responsibilities and stakeholder management'
+      ],
+      completed: false,
+      progress: 0
+    });
+  }
+
+  return milestones;
+};
+
+// Override fetch for the Gemini API endpoint simulation
 const originalFetch = window.fetch;
 window.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   if (typeof input === 'string' && input === '/api/generate-roadmap') {
     return new Promise((resolve) => {
       const body = init?.body ? JSON.parse(init.body as string) : {};
       
-      mockGenerateRoadmap(body)
+      mockGenerateRoadmapWithGemini(body)
         .then(result => {
           resolve(new Response(JSON.stringify(result), {
             status: 200,

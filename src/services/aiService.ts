@@ -27,8 +27,7 @@ interface Roadmap {
 }
 
 export const generateCareerRoadmap = async (userProfile: UserProfile): Promise<Roadmap> => {
-  const prompt = `
-Create a detailed career roadmap for someone transitioning to ${userProfile.targetRole} in the ${userProfile.industry} industry.
+  const prompt = `Create a detailed career roadmap for someone transitioning to ${userProfile.targetRole} in the ${userProfile.industry} industry.
 
 Current situation:
 - Name: ${userProfile.name}
@@ -44,7 +43,9 @@ Please create a structured roadmap with 4-6 milestones. Each milestone should ha
 - A realistic duration based on the timeframe
 - 3-5 specific, actionable tasks
 
-Format the response as JSON with this structure:
+Focus on practical, industry-specific skills and experiences needed for ${userProfile.targetRole}. Consider the user's current experience level and learning preferences.
+
+Return the response in JSON format with this structure:
 {
   "role": "${userProfile.targetRole}",
   "timeline": "${userProfile.timeframe}",
@@ -59,10 +60,7 @@ Format the response as JSON with this structure:
       "progress": 0
     }
   ]
-}
-
-Focus on practical, industry-specific skills and experiences needed for ${userProfile.targetRole}. Consider the user's current experience level and learning preferences.
-  `;
+}`;
 
   try {
     const response = await fetch('/api/generate-roadmap', {
@@ -70,17 +68,21 @@ Focus on practical, industry-specific skills and experiences needed for ${userPr
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ 
+        prompt,
+        model: 'gemini-1.5-flash',
+        userProfile 
+      }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate roadmap');
+      throw new Error('Failed to generate roadmap with Gemini');
     }
 
     const data = await response.json();
     return data.roadmap;
   } catch (error) {
-    console.error('Error generating roadmap:', error);
+    console.error('Error generating roadmap with Gemini:', error);
     
     // Fallback to enhanced mock data based on user profile
     return generateFallbackRoadmap(userProfile);
@@ -123,25 +125,27 @@ const generateFallbackRoadmap = (userProfile: UserProfile): Roadmap => {
     },
     {
       id: 3,
-      title: 'Portfolio & Professional Presence',
-      description: 'Showcase your capabilities and build your network',
+      title: `${userProfile.industry} Domain Knowledge`,
+      description: `Develop expertise in ${userProfile.industry.toLowerCase()} industry standards and practices`,
       duration: userProfile.timeframe === '3-months' ? '3 weeks' : '6 weeks',
       tasks: [
-        'Create professional portfolio',
-        'Optimize LinkedIn and professional profiles',
-        'Publish thought leadership content'
+        `Research ${userProfile.industry.toLowerCase()} industry trends and challenges`,
+        'Learn industry-specific tools and technologies',
+        'Study successful companies and their technical approaches',
+        'Network with professionals in the industry'
       ],
       completed: false,
       progress: 0
     },
     {
       id: 4,
-      title: 'Job Search & Interview Preparation',
+      title: 'Professional Preparation',
       description: 'Prepare for and execute your job search strategy',
       duration: userProfile.timeframe === '3-months' ? '3 weeks' : '4 weeks',
       tasks: [
         'Tailor resume for target role',
         'Practice technical and behavioral interviews',
+        'Build professional online presence (LinkedIn, GitHub)',
         'Apply to target positions and network actively'
       ],
       completed: false,
