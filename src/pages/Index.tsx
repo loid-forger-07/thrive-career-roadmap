@@ -1,65 +1,52 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDown, User, Calendar, Check } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import CareerAssessment from "@/components/CareerAssessment";
 import RoadmapTimeline from "@/components/RoadmapTimeline";
 import ProgressDashboard from "@/components/ProgressDashboard";
+import LoadingRoadmap from "@/components/LoadingRoadmap";
+import { generateCareerRoadmap } from "@/services/aiService";
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<'landing' | 'assessment' | 'roadmap' | 'progress'>('landing');
+  const [currentStep, setCurrentStep] = useState<'landing' | 'assessment' | 'loading' | 'roadmap' | 'progress'>('landing');
   const [userProfile, setUserProfile] = useState(null);
   const [roadmapData, setRoadmapData] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
 
-  const handleAssessmentComplete = (profile: any) => {
+  const handleAssessmentComplete = async (profile: any) => {
     setUserProfile(profile);
-    // Simulate AI processing and roadmap generation
-    const mockRoadmap = {
-      role: profile.targetRole,
-      timeline: '6 months',
-      milestones: [
-        {
-          id: 1,
-          title: 'Foundation Skills',
-          description: 'Master the fundamentals',
-          duration: '4 weeks',
-          tasks: ['Complete React Basics Course', 'Build First Portfolio Project', 'Set up GitHub Profile'],
-          completed: false,
-          progress: 0
-        },
-        {
-          id: 2,
-          title: 'Intermediate Development',
-          description: 'Build real-world applications',
-          duration: '6 weeks',
-          tasks: ['Create Full-Stack Application', 'Learn Database Management', 'API Integration Project'],
-          completed: false,
-          progress: 0
-        },
-        {
-          id: 3,
-          title: 'Advanced Skills & Portfolio',
-          description: 'Showcase your expertise',
-          duration: '4 weeks',
-          tasks: ['Advanced React Patterns', 'Performance Optimization', 'Deploy Production Apps'],
-          completed: false,
-          progress: 0
-        },
-        {
-          id: 4,
-          title: 'Job Preparation',
-          description: 'Get ready for interviews',
-          duration: '4 weeks',
-          tasks: ['Technical Interview Prep', 'Resume Optimization', 'Mock Interviews'],
-          completed: false,
-          progress: 0
-        }
-      ]
-    };
-    setRoadmapData(mockRoadmap);
-    setCurrentStep('roadmap');
+    setCurrentStep('loading');
+    setIsGenerating(true);
+
+    try {
+      console.log('Generating roadmap for profile:', profile);
+      const roadmap = await generateCareerRoadmap(profile);
+      console.log('Generated roadmap:', roadmap);
+      
+      setRoadmapData(roadmap);
+      setCurrentStep('roadmap');
+      
+      toast({
+        title: "Roadmap Generated! 🎉",
+        description: "Your personalized career roadmap has been created successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating roadmap:', error);
+      toast({
+        title: "Generation Failed",
+        description: "We'll use a personalized template based on your profile instead.",
+        variant: "destructive",
+      });
+      
+      // Still show roadmap with fallback data
+      setCurrentStep('roadmap');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const renderLandingPage = () => (
@@ -189,6 +176,14 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
         <CareerAssessment onComplete={handleAssessmentComplete} onBack={() => setCurrentStep('landing')} />
+      </div>
+    );
+  }
+
+  if (currentStep === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+        <LoadingRoadmap />
       </div>
     );
   }
