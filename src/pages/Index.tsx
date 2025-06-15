@@ -1,14 +1,221 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowDown, User, Calendar, Check } from "lucide-react";
+import CareerAssessment from "@/components/CareerAssessment";
+import RoadmapTimeline from "@/components/RoadmapTimeline";
+import ProgressDashboard from "@/components/ProgressDashboard";
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+  const [currentStep, setCurrentStep] = useState<'landing' | 'assessment' | 'roadmap' | 'progress'>('landing');
+  const [userProfile, setUserProfile] = useState(null);
+  const [roadmapData, setRoadmapData] = useState(null);
+
+  const handleAssessmentComplete = (profile: any) => {
+    setUserProfile(profile);
+    // Simulate AI processing and roadmap generation
+    const mockRoadmap = {
+      role: profile.targetRole,
+      timeline: '6 months',
+      milestones: [
+        {
+          id: 1,
+          title: 'Foundation Skills',
+          description: 'Master the fundamentals',
+          duration: '4 weeks',
+          tasks: ['Complete React Basics Course', 'Build First Portfolio Project', 'Set up GitHub Profile'],
+          completed: false,
+          progress: 0
+        },
+        {
+          id: 2,
+          title: 'Intermediate Development',
+          description: 'Build real-world applications',
+          duration: '6 weeks',
+          tasks: ['Create Full-Stack Application', 'Learn Database Management', 'API Integration Project'],
+          completed: false,
+          progress: 0
+        },
+        {
+          id: 3,
+          title: 'Advanced Skills & Portfolio',
+          description: 'Showcase your expertise',
+          duration: '4 weeks',
+          tasks: ['Advanced React Patterns', 'Performance Optimization', 'Deploy Production Apps'],
+          completed: false,
+          progress: 0
+        },
+        {
+          id: 4,
+          title: 'Job Preparation',
+          description: 'Get ready for interviews',
+          duration: '4 weeks',
+          tasks: ['Technical Interview Prep', 'Resume Optimization', 'Mock Interviews'],
+          completed: false,
+          progress: 0
+        }
+      ]
+    };
+    setRoadmapData(mockRoadmap);
+    setCurrentStep('roadmap');
+  };
+
+  const renderLandingPage = () => (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative container mx-auto px-4 py-20 text-center text-white">
+          <div className="max-w-4xl mx-auto">
+            <Badge className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20 transition-all duration-300">
+              🚀 AI-Powered Career Planning
+            </Badge>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+              Your Personalized Career Roadmap
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-blue-100 leading-relaxed">
+              Get a tailored, step-by-step career plan powered by AI. Track your progress, 
+              achieve milestones, and land your dream job.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Button 
+                size="lg" 
+                className="bg-white text-purple-900 hover:bg-blue-50 font-semibold px-8 py-4 text-lg transition-all duration-300 transform hover:scale-105"
+                onClick={() => setCurrentStep('assessment')}
+              >
+                Start Your Journey
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg transition-all duration-300"
+              >
+                Watch Demo
+              </Button>
+            </div>
+            <div className="animate-bounce">
+              <ArrowDown className="mx-auto text-white/60" size={32} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Our Career Roadmaps?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Our AI-powered platform creates personalized career paths that adapt to your unique background and goals.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <User className="text-white" size={28} />
+                </div>
+                <CardTitle className="text-2xl font-bold text-gray-900">AI-Powered Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-600 text-lg leading-relaxed">
+                  Advanced AI analyzes your skills, experience, and goals to create a perfectly tailored career roadmap.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Calendar className="text-white" size={28} />
+                </div>
+                <CardTitle className="text-2xl font-bold text-gray-900">Dynamic Timeline</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-600 text-lg leading-relaxed">
+                  Interactive timeline with milestones, deadlines, and progress tracking to keep you motivated and on track.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Check className="text-white" size={28} />
+                </div>
+                <CardTitle className="text-2xl font-bold text-gray-900">Adaptive Updates</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-gray-600 text-lg leading-relaxed">
+                  Your roadmap evolves based on your progress, market changes, and new opportunities in your field.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="py-20 bg-gradient-to-r from-purple-600 to-blue-600">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Transform Your Career?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of professionals who have successfully navigated their career transitions with our AI-powered roadmaps.
+          </p>
+          <Button 
+            size="lg" 
+            className="bg-white text-purple-600 hover:bg-blue-50 font-semibold px-8 py-4 text-lg transition-all duration-300 transform hover:scale-105"
+            onClick={() => setCurrentStep('assessment')}
+          >
+            Get Started for Free
+          </Button>
+        </div>
       </div>
     </div>
   );
+
+  if (currentStep === 'landing') {
+    return renderLandingPage();
+  }
+
+  if (currentStep === 'assessment') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+        <CareerAssessment onComplete={handleAssessmentComplete} onBack={() => setCurrentStep('landing')} />
+      </div>
+    );
+  }
+
+  if (currentStep === 'roadmap') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+        <RoadmapTimeline 
+          roadmap={roadmapData} 
+          onViewProgress={() => setCurrentStep('progress')}
+          onBack={() => setCurrentStep('assessment')}
+        />
+      </div>
+    );
+  }
+
+  if (currentStep === 'progress') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+        <ProgressDashboard 
+          roadmap={roadmapData}
+          userProfile={userProfile}
+          onBack={() => setCurrentStep('roadmap')}
+        />
+      </div>
+    );
+  }
 };
 
 export default Index;
