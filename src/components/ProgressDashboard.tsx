@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,9 +17,7 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
 
   const totalTasks = roadmap.milestones.reduce((acc: number, milestone: any) => acc + milestone.tasks.length, 0);
   const completedTasksCount = completedTasks.size;
-  const overallProgress = totalTasks > 0 ? (complete
-
-TedTasksCount / totalTasks) * 100 : 0;
+  const overallProgress = totalTasks > 0 ? (completedTasksCount / totalTasks) * 100 : 0;
 
   const toggleTaskCompletion = (milestoneId: number, taskIndex: number) => {
     const taskKey = `${milestoneId}-${taskIndex}`;
