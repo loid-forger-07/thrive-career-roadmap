@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, CheckCircle, Clock, User, ArrowDown, Check } from "lucide-react";
+import { Calendar, CheckCircle, User, Check } from "lucide-react";
 
 interface ProgressDashboardProps {
   roadmap: any;
@@ -40,43 +40,43 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 text-white">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Badge className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+          <Badge className="mb-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
             📊 Progress Dashboard
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-gray-100 mb-4">
             Track Your Journey
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-400">
             Monitor your progress and stay motivated on your path to {roadmap.role}
           </p>
         </div>
 
         {/* Stats Overview */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-700 text-white border-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100">Overall Progress</p>
+                  <p className="text-blue-100">Overall Progress</p>
                   <p className="text-3xl font-bold">{Math.round(overallProgress)}%</p>
                 </div>
-                <CheckCircle size={32} className="text-purple-200" />
+                <CheckCircle size={32} className="text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
+          <Card className="bg-gradient-to-br from-teal-500 to-cyan-600 text-white border-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100">Tasks Completed</p>
+                  <p className="text-cyan-100">Tasks Completed</p>
                   <p className="text-3xl font-bold">{completedTasksCount}/{totalTasks}</p>
                 </div>
-                <Check size={32} className="text-blue-200" />
+                <Check size={32} className="text-cyan-200" />
               </div>
             </CardContent>
           </Card>
@@ -107,10 +107,10 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
         </div>
 
         <Tabs defaultValue="milestones" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="milestones">Milestones</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-gray-800 text-gray-300">
+            <TabsTrigger value="milestones" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Milestones</TabsTrigger>
+            <TabsTrigger value="profile" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Profile</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="milestones" className="mt-6">
@@ -118,18 +118,18 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
               {roadmap.milestones.map((milestone: any, index: number) => {
                 const milestoneProgress = getMilestoneProgress(milestone);
                 return (
-                  <Card key={milestone.id} className="shadow-lg">
+                  <Card key={milestone.id} className="shadow-lg bg-gray-800/50 border-blue-800/50">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="text-xl font-bold text-gray-900">
+                          <CardTitle className="text-xl font-bold text-gray-100">
                             {milestone.title}
                           </CardTitle>
-                          <CardDescription className="mt-2">
+                          <CardDescription className="mt-2 text-gray-400">
                             {milestone.description}
                           </CardDescription>
                         </div>
-                        <Badge variant={milestoneProgress === 100 ? "default" : "secondary"}>
+                        <Badge variant={milestoneProgress === 100 ? "default" : "secondary"} className="bg-blue-900/80 text-blue-300">
                           {Math.round(milestoneProgress)}% Complete
                         </Badge>
                       </div>
@@ -143,18 +143,18 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
                             <div
                               key={taskIndex}
                               className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                                isCompleted ? 'bg-green-50 border border-green-200' : 'bg-gray-50 hover:bg-gray-100'
+                                isCompleted ? 'bg-green-800/20 border border-green-700' : 'bg-gray-900/50 hover:bg-gray-700/50'
                               }`}
                               onClick={() => toggleTaskCompletion(milestone.id, taskIndex)}
                             >
                               <div
                                 className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                                  isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-300'
+                                  isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-500'
                                 }`}
                               >
                                 {isCompleted && <Check size={12} className="text-white" />}
                               </div>
-                              <span className={`${isCompleted ? 'text-green-800 line-through' : 'text-gray-700'}`}>
+                              <span className={`${isCompleted ? 'text-green-300 line-through' : 'text-gray-300'}`}>
                                 {task}
                               </span>
                             </div>
@@ -169,47 +169,47 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
           </TabsContent>
 
           <TabsContent value="profile" className="mt-6">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg bg-gray-800/50 border-blue-800/50">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-gray-900">Your Profile</CardTitle>
-                <CardDescription>Your career journey details</CardDescription>
+                <CardTitle className="text-2xl font-bold text-gray-100">Your Profile</CardTitle>
+                <CardDescription className="text-gray-400">Your career journey details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Name</label>
-                      <p className="text-lg text-gray-900">{userProfile?.name}</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Name</label>
+                      <p className="text-lg text-gray-100">{userProfile?.name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Current Role</label>
-                      <p className="text-lg text-gray-900">{userProfile?.currentRole}</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Current Role</label>
+                      <p className="text-lg text-gray-100">{userProfile?.currentRole}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Experience</label>
-                      <p className="text-lg text-gray-900">{userProfile?.experience} years</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Experience</label>
+                      <p className="text-lg text-gray-100">{userProfile?.experience} years</p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Target Role</label>
-                      <p className="text-lg text-gray-900">{userProfile?.targetRole}</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Target Role</label>
+                      <p className="text-lg text-gray-100">{userProfile?.targetRole}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Industry</label>
-                      <p className="text-lg text-gray-900">{userProfile?.industry}</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Industry</label>
+                      <p className="text-lg text-gray-100">{userProfile?.industry}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider">Timeframe</label>
-                      <p className="text-lg text-gray-900">{userProfile?.timeframe}</p>
+                      <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Timeframe</label>
+                      <p className="text-lg text-gray-100">{userProfile?.timeframe}</p>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-600 uppercase tracking-wider mb-3 block">Skills</label>
+                  <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Skills</label>
                   <div className="flex flex-wrap gap-2">
                     {userProfile?.skills?.map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="bg-purple-100 text-purple-700">
+                      <Badge key={index} variant="secondary" className="bg-blue-900/80 text-blue-300">
                         {skill}
                       </Badge>
                     ))}
@@ -264,7 +264,7 @@ const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardPr
         </Tabs>
 
         <div className="mt-8 text-center">
-          <Button onClick={onBack} variant="outline" size="lg">
+          <Button onClick={onBack} variant="outline" size="lg" className="text-white border-blue-700 hover:bg-blue-900/50 hover:text-white">
             Back to Roadmap
           </Button>
         </div>

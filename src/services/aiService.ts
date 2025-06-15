@@ -27,6 +27,13 @@ interface Roadmap {
 }
 
 export const generateCareerRoadmap = async (userProfile: UserProfile): Promise<Roadmap> => {
+  const apiKey = localStorage.getItem('gemini_api_key');
+
+  if (!apiKey) {
+    console.error('Gemini API key not found. Falling back to mock data.');
+    return generateFallbackRoadmap(userProfile);
+  }
+
   const prompt = `Create a detailed career roadmap for someone transitioning to ${userProfile.targetRole} in the ${userProfile.industry} industry.
 
 Current situation:
@@ -45,42 +52,55 @@ Please create a structured roadmap with 4-6 milestones. Each milestone should ha
 
 Focus on practical, industry-specific skills and experiences needed for ${userProfile.targetRole}. Consider the user's current experience level and learning preferences.
 
-Return the response in JSON format with this structure:
-{
-  "role": "${userProfile.targetRole}",
-  "timeline": "${userProfile.timeframe}",
-  "milestones": [
-    {
-      "id": 1,
-      "title": "Milestone Title",
-      "description": "What this milestone accomplishes",
-      "duration": "X weeks",
-      "tasks": ["Task 1", "Task 2", "Task 3"],
-      "completed": false,
-      "progress": 0
-    }
-  ]
+Return ONLY a valid JSON object based on the following TypeScript interfaces, without any markdown formatting like \`\`\`json or any other text outside the JSON object:
+interface Milestone {
+  id: number;
+  title: string;
+  description: string;
+  duration: string;
+  tasks: string[];
+}
+interface Roadmap {
+  role: string;
+  timeline: string;
+  milestones: Milestone[];
 }`;
 
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
   try {
-    const response = await fetch('/api/generate-roadmap', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        prompt,
-        model: 'gemini-1.5-flash',
-        userProfile 
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          response_mime_type: "application/json",
+        },
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate roadmap with Gemini');
+      const errorBody = await response.text();
+      console.error('Failed to generate roadmap with Gemini API. Status:', response.status, 'Body:', errorBody);
+      throw new Error(`Failed to generate roadmap with Gemini. Status: ${response.status}`);
     }
 
     const data = await response.json();
-    return data.roadmap;
+    console.log('Gemini API response:', data);
+    
+    const roadmapJsonString = data.candidates[0].content.parts[0].text;
+    const roadmap = JSON.parse(roadmapJsonString);
+    
+    roadmap.milestones.forEach((m: Milestone, index: number) => {
+        m.id = m.id || index + 1;
+        m.completed = false;
+        m.progress = 0;
+    });
+
+    return roadmap;
   } catch (error) {
     console.error('Error generating roadmap with Gemini:', error);
     
