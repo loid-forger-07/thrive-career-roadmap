@@ -1,4 +1,6 @@
 
+import { v4 as uuidv4 } from 'uuid';
+
 interface UserProfile {
   name: string;
   currentRole: string;
@@ -21,17 +23,49 @@ interface Milestone {
 }
 
 interface Roadmap {
+  id?: string;
   role: string;
   timeline: string;
   milestones: Milestone[];
+  userProfile?: UserProfile;
+  createdAt?: string;
 }
 
 export const generateCareerRoadmap = async (userProfile: UserProfile): Promise<Roadmap> => {
+  const generateAndSaveRoadmap = (roadmapGenerator: (profile: UserProfile) => Roadmap | Promise<Roadmap>) => {
+    return new Promise<Roadmap>(async (resolve) => {
+      const generatedRoadmap = await roadmapGenerator(userProfile);
+      
+      const roadmapWithId: Roadmap = {
+        ...generatedRoadmap,
+        id: uuidv4(),
+        createdAt: new Date().toISOString(),
+        userProfile: userProfile,
+      };
+
+      roadmapWithId.milestones.forEach((m: Milestone, index: number) => {
+        m.id = m.id || index + 1;
+        m.completed = false;
+        m.progress = 0;
+      });
+
+      try {
+        const savedRoadmaps = JSON.parse(localStorage.getItem('saved_roadmaps') || '[]');
+        savedRoadmaps.push(roadmapWithId);
+        localStorage.setItem('saved_roadmaps', JSON.stringify(savedRoadmaps));
+      } catch (e) {
+        console.error("Failed to save roadmap to local storage", e);
+      }
+      
+      resolve(roadmapWithId);
+    });
+  };
+
   const apiKey = localStorage.getItem('gemini_api_key');
 
   if (!apiKey) {
     console.error('Gemini API key not found. Falling back to mock data.');
-    return generateFallbackRoadmap(userProfile);
+    return generateAndSaveRoadmap(generateFallbackRoadmap);
   }
 
   const prompt = `Create a detailed career roadmap for someone transitioning to ${userProfile.targetRole} in the ${userProfile.industry} industry.
@@ -94,18 +128,11 @@ interface Roadmap {
     const roadmapJsonString = data.candidates[0].content.parts[0].text;
     const roadmap = JSON.parse(roadmapJsonString);
     
-    roadmap.milestones.forEach((m: Milestone, index: number) => {
-        m.id = m.id || index + 1;
-        m.completed = false;
-        m.progress = 0;
-    });
+    return generateAndSaveRoadmap(() => roadmap);
 
-    return roadmap;
   } catch (error) {
     console.error('Error generating roadmap with Gemini:', error);
-    
-    // Fallback to enhanced mock data based on user profile
-    return generateFallbackRoadmap(userProfile);
+    return generateAndSaveRoadmap(generateFallbackRoadmap);
   }
 };
 

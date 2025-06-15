@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,19 @@ interface ProgressDashboardProps {
 }
 
 const ProgressDashboard = ({ roadmap, userProfile, onBack }: ProgressDashboardProps) => {
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined' && roadmap.id) {
+      const saved = localStorage.getItem(`roadmap_progress_${roadmap.id}`);
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    if (roadmap.id) {
+      localStorage.setItem(`roadmap_progress_${roadmap.id}`, JSON.stringify(Array.from(completedTasks)));
+    }
+  }, [completedTasks, roadmap.id]);
 
   const totalTasks = roadmap.milestones.reduce((acc: number, milestone: any) => acc + milestone.tasks.length, 0);
   const completedTasksCount = completedTasks.size;

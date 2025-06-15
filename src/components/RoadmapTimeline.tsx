@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Clock, ArrowDown, Calendar } from "lucide-react";
+import { CheckCircle, Clock, ArrowDown, Calendar, Folder } from "lucide-react";
 
 interface Milestone {
   id: number;
@@ -45,13 +46,19 @@ const RoadmapTimeline = ({ roadmap, onViewProgress, onBack }: RoadmapTimelinePro
           <p className="text-xl text-gray-400 mb-6">
             A {roadmap.timeline} journey tailored specifically for you
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button onClick={onViewProgress} className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900">
               <Calendar className="mr-2" size={16} />
               View Progress Dashboard
             </Button>
             <Button variant="outline" onClick={onBack} className="text-white border-blue-700 hover:bg-blue-900/50 hover:text-white">
               Modify Assessment
+            </Button>
+             <Button variant="outline" asChild className="text-white border-teal-700 hover:bg-teal-900/50 hover:text-white">
+              <Link to="/roadmaps">
+                <Folder className="mr-2" size={16} />
+                View All Roadmaps
+              </Link>
             </Button>
           </div>
           
